@@ -1,0 +1,146 @@
+<script src="lib/msrcrypto.js" type="text/javascript"></script>
+<script>
+
+    // var cry = crypto || msrCrypto;
+    var cry = msrCrypto;
+    cry.toBase64 = msrCrypto.toBase64
+    cry.fromBase64 = msrCrypto.fromBase64
+    cry.textToBytes = msrCrypto.textToBytes
+    cry.bytesToText = msrCrypto.bytesToText
+    cry.toHex = (buffer) => { // buffer is an ArrayBuffer
+        return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
+    }
+    //RSA-OAEP
+    var sk;
+    var pk
+    (async () => {
+        cryptoKey = await cry.subtle.generateKey({
+            name: "RSA-OAEP",
+            modulusLength: 2048,
+            publicExponent: new Uint8Array([1, 0, 1]),
+            hash: "SHA-256"
+        }, true, ["encrypt", "decrypt"]).catch(e => console.error(e))
+
+        console.log(cryptoKey)
+        pubKey = await cry.subtle.exportKey('spki', cryptoKey.publicKey);
+        console.log("pubKeyBase64:", cry.toBase64(pubKey))
+
+
+        encrypted = await cry.subtle.encrypt(
+            { name: "RSA-OAEP" }
+            , cryptoKey.publicKey
+            , new Uint8Array(cry.textToBytes("hello"))
+        ).catch(e => console.error(e))
+
+
+        console.log(encrypted)
+        sk = cryptoKey.privateKey
+        data = await cry.subtle.decrypt(
+            { name: "RSA-OAEP" }
+            , cryptoKey.privateKey
+            , encrypted
+        )
+
+        console.log(cry.bytesToText(data))
+
+    })();
+
+
+    //HMAC
+    (async () => {
+        var hmacKey = await cry.subtle.importKey("raw", new Uint8Array([1, 2, 3, 4, 5, 6]), { "name": "HMAC", hash: "sha-256" }, false, ['sign']).catch(e => console.error(e))
+        var sign = await cry.subtle.sign({ name: "HMAC" }, hmacKey, new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]))
+        console.log(sign)
+    })();
+
+
+    //AES
+    (async () => {
+        var aesKey = await cry.subtle.importKey("raw", new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]), { "name": "AES-CBC" }, false, ['encrypt', 'decrypt']).catch(e => console.error(e))
+
+        const encrypted = await cry.subtle.encrypt({ name: "AES-CBC", iv: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]) }, aesKey, new Uint8Array([1, 2, 3, 4, 5, 6]));
+        console.log(encrypted)
+        const decrypted = await cry.subtle.decrypt({ name: "AES-CBC", iv: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]) }, aesKey, encrypted);
+        console.log(decrypted)
+    })();
+
+
+    // spki test
+    (async () => {
+
+        for (var i = 0; i < 1; i++) {
+            var cryptoKey = await cry.subtle.generateKey({
+                name: "RSA-OAEP",
+                modulusLength: 2048,
+                publicExponent: new Uint8Array([1, 0, 1]),
+                hash: "SHA-256"
+            }, true, ["encrypt", "decrypt"]).catch(e => console.error(e))
+
+            pk = cryptoKey.publicKey
+
+
+            //纯js公钥加密
+            var encrypted = await cry.subtle.encrypt(
+                { name: "RSA-OAEP" }
+                , pk
+                , new Uint8Array(cry.textToBytes("hello"))
+            ).catch(e => console.error(e))
+
+            sk = cryptoKey.privateKey
+            var priKeyJwk = await cry.subtle.exportKey('jwk', sk);
+            var pubKeyDer = await cry.subtle.exportKey('spki', pk);
+
+            console.log("pubKeyBase64:", cry.toBase64(pubKeyDer))
+            
+            //原生私钥解密
+            sk = await crypto.subtle.importKey(
+                "jwk",
+                priKeyJwk,
+                { name: "RSA-OAEP", hash: "sha-256" },
+                true,
+                ["decrypt"])
+
+            var data = await crypto.subtle.decrypt(
+                { name: "RSA-OAEP" }
+                , sk
+                , encrypted
+            )
+
+            console.log(cry.bytesToText(data))
+
+            //原生公钥加密
+            pk = await crypto.subtle.importKey(
+                "spki",
+                pubKeyDer,
+                { name: "RSA-OAEP", hash: "sha-256" },
+                true,
+                ["encrypt"])
+            console.log("pubKeyBase64:",cry.toBase64(await crypto.subtle.exportKey('spki', pk)))
+            encrypted = await crypto.subtle.encrypt(
+                { name: "RSA-OAEP" }
+                , pk
+                , new Uint8Array(cry.textToBytes("hello"))
+            ).catch(e => console.error(e))
+
+
+            //纯js私钥解密
+            sk = await cry.subtle.importKey(
+                "jwk",
+                priKeyJwk,
+                { name: "RSA-OAEP", hash: "sha-256" },
+                true,
+                ["decrypt"])
+
+            var data = await cry.subtle.decrypt(
+                { name: "RSA-OAEP" }
+                , sk
+                , encrypted
+            )
+            console.log(cry.bytesToText(data))
+
+
+
+        }
+    })();
+
+</script>

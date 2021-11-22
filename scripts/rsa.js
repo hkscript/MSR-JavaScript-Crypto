@@ -287,6 +287,10 @@ if (typeof operations !== "undefined") {
     };
 
     msrcryptoRsa.exportKey = function(/*@dynamic*/ p) {
+        if(p.format==='spki'){
+            return { type: "keyExport", keyHandle: rsaDer.exportKeyToSpki(p)};
+        }
+
         var jsonKeyStringArray = msrcryptoJwk.keyToJwk(p.keyHandle, p.keyData);
 
         return { type: "keyExport", keyHandle: jsonKeyStringArray };

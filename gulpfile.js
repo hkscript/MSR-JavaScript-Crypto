@@ -52,7 +52,7 @@ const fullBuild = [
     "scripts/rsa-pkcs1.js",
     "scripts/rsa-pss.js",
     "scripts/rsa.js",
-     "scripts/concat.js",
+    "scripts/concat.js",
     "scripts/pbkdf2.js",
     "scripts/hkdf.js",
     "scripts/hkdf-ctr.js",
@@ -63,6 +63,7 @@ const fullBuild = [
     "scripts/bundleTail.js",
     "scripts/subtle/promises.js"
 ];
+
 
 const aesBuild = [
     "scripts/bundleHead.js",
@@ -87,6 +88,44 @@ const aesBuild = [
     "scripts/subtle/promises.js"
 ];
 
+
+const rsaBuild = [
+    "scripts/bundleHead.js",
+    "scripts/operations.js",
+    "scripts/global.js",
+    "scripts/utilities.js",
+    "scripts/asn1.js",
+    "scripts/worker.js",
+    "scripts/jwk.js",
+    "scripts/cryptoMath.js",
+    "scripts/sha.js",
+    "scripts/sha256.js",
+    // "scripts/sha512.js",
+    "scripts/hmac.js",
+    "scripts/aes.js",
+    "scripts/aes-cbc.js",
+    // "scripts/aes-gcm.js",
+    "scripts/random.js",
+    "scripts/entropy.js",
+    "scripts/prime.js",
+    "scripts/rsa-base.js",
+    "scripts/rsa-oaep.js",
+    // "scripts/rsa-pkcs1.js",
+    // "scripts/rsa-pss.js",
+    "scripts/rsa.js",
+    //  "scripts/concat.js",
+    // "scripts/pbkdf2.js",
+    // "scripts/hkdf.js",
+    // "scripts/hkdf-ctr.js",
+    // "scripts/ecdh.js",
+    // "scripts/ecdsa.js",
+    "scripts/subtle.js",
+    // "scripts/wrapKey.js",
+    "scripts/bundleTail.js",
+    "scripts/rsa-der.js",
+    // "scripts/subtle/promises.js"
+];
+
 const testBuild = fullBuild.concat([
     "scripts/testInterface.js"
 ]);
@@ -109,7 +148,7 @@ function subtle() {
 
 // Concat the files into a single bundle.
 function bundle() {
-    return gulp.src(fullBuild)
+    return gulp.src(rsaBuild)
         .pipe(concat("msrcrypto.js"))   // concatenate scripts into single UMD module
         .pipe(gulp.dest("lib"));        // write the file to the lib folder
 }
