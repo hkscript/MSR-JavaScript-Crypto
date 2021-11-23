@@ -121,8 +121,8 @@ const rsaBuild = [
     // "scripts/ecdsa.js",
     "scripts/subtle.js",
     // "scripts/wrapKey.js",
-    "scripts/bundleTail.js",
     "scripts/rsa-der.js",
+    "scripts/bundleTail.js",
     // "scripts/subtle/promises.js"
 ];
 
