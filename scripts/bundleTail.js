@@ -122,7 +122,7 @@ var publicMethods = {
     },
 
     asn1 : asn1,
-
+    util : msrcryptoUtilities,
     /// <field type = 'String'>URL of the this msrCrypto script.</field>
     url : scriptUrl,
 
