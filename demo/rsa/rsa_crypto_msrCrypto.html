@@ -1,12 +1,12 @@
-<script src="lib/msrcrypto.js" type="text/javascript"></script>
+<script src="../../lib/msrcrypto.js" type="text/javascript"></script>
 <script>
 
-    // var cry = crypto || msrCrypto;
-    var cry = msrCrypto;
+    var cry = crypto || msrCrypto;
     cry.toBase64 = msrCrypto.toBase64
     cry.fromBase64 = msrCrypto.fromBase64
     cry.textToBytes = msrCrypto.textToBytes
     cry.bytesToText = msrCrypto.bytesToText
+    
     cry.toHex = (buffer) => { // buffer is an ArrayBuffer
         return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
     }
